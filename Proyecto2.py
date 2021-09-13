@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 root = Tk()
-#
+##
 root.title("Bitxelart")
 root.iconbitmap("favicon.ico")
 root.resizable(False,False)
