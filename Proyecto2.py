@@ -2,10 +2,16 @@ from tkinter import *
 from tkinter import ttk
 from typing import Sized
 from PIL import ImageTk, Image
+from tkinter import filedialog as FileDialog
+from Analizar_Maquina import AMaquina
+from Analizar_Simulacion import ASimulacion
+import time
+import threading
 
 class app():
     def __init__(self):
         self.root = Tk()
+        self.rut1=''
         
         #Configurando ventana
         self.root.title("DIGITAL INTELLIGENCE S.A.")
@@ -34,8 +40,8 @@ class app():
 
         #Menú Cargar
         Cmenu = Menu(menubar)
-        Cmenu.add_command(label="Archivo de configuración")
-        Cmenu.add_command(label="Archivo de simulación")
+        Cmenu.add_command(label="Archivo de configuración", command=self.BusArchvivoConfig)
+        Cmenu.add_command(label="Archivo de simulación", command=self.BusArchvivoSimul)
         Cmenu.add_command(label="Salir")
         menubar.add_cascade(label="Cargar", menu=Cmenu)
 
@@ -103,24 +109,27 @@ class app():
         tab1.config(bg="#1D1E1B", width=635, height=525)
         
         Label(tab1, text="Archivo de configuración: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=10)
-        Ruta1=Label(tab1, text="...", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=30)
+        self.Rutaa1=Label(tab1, text="...", wraplength=620,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 11, "bold"))
+        self.Rutaa1.place(x=10,y=30)
 
         Label(tab1, text="Archivo de simulación: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=60)
-        Ruta2=Label(tab1, text="...", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=80)
+        self.Rutaa2=Label(tab1, text="...", wraplength=620,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 11, "bold"))
+        self.Rutaa2.place(x=10,y=80)
 
-        Label(tab1, text="Selecciona el producto a trabajar: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=110)
-        comboExample = ttk.Combobox(tab1, values=["op1","op2","op3","op4"]).place(x=10,y=140)
+        Label(tab1, text="Producto que se está trabajando: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=110)
+        self.Producto=Label(tab1, text="...", wraplength=620,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold"))
+        self.Producto.place(x=10,y=140)
 
         Label(tab1, text="Componentes necesarios: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=180)
         #componentes
         componentes = Frame(tab1)
         scrollbar = ttk.Scrollbar(componentes,orient=VERTICAL)
-        self.listbox = Listbox(componentes, width=19, height=5, yscrollcommand=scrollbar.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
-        for i in range(20):
-            self.listbox.insert(END, "Elemento {}".format(i))
-        scrollbar.config(command=self.listbox.yview)
+        self.listComponentes = Listbox(componentes, width=19, height=5, yscrollcommand=scrollbar.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
+        #for i in range(2):
+            #self.listComponentes.insert(END, "Elemento {}".format(i))
+        scrollbar.config(command=self.listComponentes.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
-        self.listbox.pack()
+        self.listComponentes.pack()
         componentes.place(x=10,y=210)
 
 
@@ -128,25 +137,27 @@ class app():
         componentes = Frame(tab1)
         scrollbarY = ttk.Scrollbar(componentes,orient=VERTICAL)
         scrollbarX = ttk.Scrollbar(componentes,orient=HORIZONTAL)
-        self.listbox = Listbox(componentes, width=32, height=13, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
-        for i in range(20):
-            self.listbox.insert(END, "Elementoooooooooooooooooooooooooooooooo {}".format(i))
-        scrollbarY.config(command=self.listbox.yview)
+        self.listEnsam = Listbox(componentes, width=32, height=13, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
+        #for i in range(2):
+            #self.listEnsam.insert(END, "Elemento {}".format(i))
+        scrollbarY.config(command=self.listEnsam.yview)
         scrollbarY.pack(side=RIGHT, fill=Y)
-        scrollbarX.config(command=self.listbox.xview)
+        scrollbarX.config(command=self.listEnsam.xview)
         scrollbarX.pack(side=BOTTOM, fill=X)
-        self.listbox.pack()
+        self.listEnsam.pack()
         componentes.place(x=250,y=210)
 
-        pb = ttk.Progressbar(tab1,orient='horizontal',mode='determinate',length=230).place(x=10,y=350)
+        self.pb = ttk.Progressbar(tab1,orient='horizontal',mode='determinate',length=230).place(x=10,y=350)
 
         tabimg = Canvas(tab1,width=100,height=100, bg="black")
         tabimg.create_image(0,0,image=img,anchor="nw")
         tabimg.place(x=10,y=400)
 
-        tiempo=Label(tab1, text="tiempo ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=120,y=440)
+        self.tiempo=Label(tab1, text="tiempo ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=120,y=440)
 
-        Button(tab1,text='Iniciar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold")).place(x=530,y=160)
+        self.hilo1 = threading.Thread(target=self.Simulacion)
+        
+        Button(tab1,text='Iniciar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"), command=lambda: self.hilo1.start()).place(x=530,y=160)
 
         self.tabControl.add(tab1, text = 'Proceso')
 
@@ -176,8 +187,124 @@ class app():
 
         Label(win, text="En esta aplicación se pueden crear simulaciones del tiempo que toma ensamblar un producto que se solicite, según la configuración establecida por el usuario. \n\n Programado en Python 3.9.6 \n Reportes generados con Graphviz y HTML5",fg="#D90808", wraplength=510,bg="#1D1E1B", font=("Fixedsys", 15, "bold")).place(x=10,y=10)
         
-
         Button(win,text='Aceptar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=win.destroy).place(x=210,y=180)
 
+    def BusArchvivoConfig(self):
+        win = Toplevel()
+        win.wm_title("Window")
+        win.resizable(False,False)
+        win.config(height=150,width=530,bg="#1D1E1B")
+        win.title("Cargar Archivo de Configuración")
+        win.iconbitmap("icono.ico")
 
+        Label(win, text="Buscar Archivo",fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 15, "bold")).place(x=10,y=10)
+        self.rut1=Entry(win,width=37, text="",fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 15, "bold"))
+        self.rut1.place(x=10,y=40)
+        Button(win,text='Buscar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=lambda: self.Ruta1()).place(x=430,y=40)
+        
+        Button(win,text='Aceptar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=win.destroy).place(x=210,y=100)
+
+    def Ruta1(self):
+        #Utilizando fliedialog de tkinter para abrir un archivo
+        ruta=FileDialog.askopenfilename(title="Abrir un fichero")
+        self.rut1.delete(0,END)
+        self.rut1.insert(0, ruta)
+        self.Rutaa1.config(text=ruta)
+
+    def Finalizado(self,Nombre):
+        win = Toplevel()
+        win.wm_title("Window")
+        win.resizable(False,False)
+        win.config(height=150,width=330,bg="#1D1E1B")
+        win.title("Cargar Archivo de Configuración")
+        win.iconbitmap("icono.ico")
+
+        Label(win, text="Simulación de {}, finalizada con exito".format(Nombre), wraplength=300,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 15, "bold")).place(x=10,y=10)
+        
+        Button(win,text='Aceptar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=win.destroy).place(x=210,y=100)
+
+
+    def BusArchvivoSimul(self):
+        win = Toplevel()
+        win.wm_title("Window")
+        win.resizable(False,False)
+        win.config(height=150,width=530,bg="#1D1E1B")
+        win.title("Cargar Archivo de Simulación")
+        win.iconbitmap("icono.ico")
+
+        Label(win, text="Buscar Archivo",fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 15, "bold")).place(x=10,y=10)
+        self.rut2=Entry(win,width=37, text="",fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 15, "bold"))
+        self.rut2.place(x=10,y=40)
+        Button(win,text='Buscar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=lambda: self.Ruta2()).place(x=430,y=40)
+        
+        Button(win,text='Aceptar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=win.destroy).place(x=210,y=100)
+
+    def Ruta2(self):
+        #Utilizando fliedialog de tkinter para abrir un archivo
+        ruta=FileDialog.askopenfilename(title="Abrir un fichero")
+        self.rut2.delete(0,END)
+        self.rut2.insert(0, ruta)
+        self.Rutaa2.config(text=ruta)
+
+    def Simulacion(self):
+        print(self.Rutaa1.cget("text"))
+        print(self.Rutaa2.cget("text"))
+        ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
+        simulacion=ASimulacion.AnalizarArchivoS(self.Rutaa2.cget("text"))
+
+        #************************** Configuracion Maquina **************************
+        
+        print('Nombre: '+simulacion.getNombreS())
+        self.listEnsam.insert(END, "Nombre: {}".format(simulacion.getNombreS()))
+
+        #************************** Configuracion Maquina **************************
+        ConfMaq=ObjMaquina.retornar_seleccionado(1)
+        print('Lineas de ensamblaje'+ConfMaq.getNoLineas())
+        liss=ConfMaq.getListLineas()
+        liss.mostrar()
+
+        i=1
+        Simular=False
+        while simulacion.getListP().retornar_seleccionado(i) != None:
+            #print(simulacion.getListP().retornar_seleccionado(i).getNombre())
+            j=1
+            while ConfMaq.getListProductos().retornar_seleccionado(j) != None:
+                if simulacion.getListP().retornar_seleccionado(i).getNombre() == ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
+                    Simular=True
+                    self.listEnsam.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    self.Producto.config(text=ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    self.listComponentes.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    print(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    c2=ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
+                    
+                    k=1
+                    while c2.retornar_seleccionado(k) != None:
+                        self.listComponentes.insert(END, "Linea {} Columna {}".format(c2.retornar_seleccionado(k).getLinea(),c2.retornar_seleccionado(k).getComponente()))
+                        k+=1
+                    self.armar(ConfMaq.getNoLineas(),c2)
+                j+=1
+            
+            if Simular:
+                self.Finalizado(simulacion.getListP().retornar_seleccionado(i).getNombre())
+                time.sleep(2)
+            i+=1
+
+    def armar(self,n,cola):
+        print("Numero de Lineas "+n) 
+        
+        x=1
+
+        for x in range(int(n)+1):
+            k=1  
+            while cola.retornar_seleccionado(k) != None:
+                if x == int(cola.retornar_seleccionado(k).getLinea()):
+                    print("Linea {} Componente {}".format(cola.retornar_seleccionado(k).getLinea(),cola.retornar_seleccionado(k).getComponente()))
+                    break
+                k+=1 
+            
+
+    def recorrer():
+        componente=0
+
+    #***************************************************************************
 app()
