@@ -1,0 +1,85 @@
+def recorrer(self, Ls, colaE,n,Estado):
+        
+        self.tiempo.config(text="0s")
+    
+        self.rep=False
+        self.camb=False
+        self.cont=0
+        lim=colaE.long()
+        time=0
+        colaE.mostrar()
+        
+        
+        while colaE.retornar_seleccionado(1)!=None:
+            for cc in range(int(n)+1):
+                if cc!=0:
+                    #anterior=Ls
+                    L=Ls.retornar_seleccionado(cc).getLinea()
+                    C=Ls.retornar_seleccionado(cc).getComponente()
+                    P=Ls.retornar_seleccionado(cc).getPosicion()
+                    es=Ls.retornar_seleccionado(cc).getEstado()
+                    if str(C) == str(P):
+                        try:
+                            if str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
+                                k=1
+                                #print(self.ens)
+                                if es==True:
+                                    colaE.EliminarP()
+                                    while colaE.retornar_seleccionado(k) != None:
+                                        try:
+                                            if int(L) == int(colaE.retornar_seleccionado(k).getLinea()):
+                                                C=colaE.retornar_seleccionado(k).getComponente()
+                                                break
+                                        except:
+                                            break
+                                        k+=1
+                                    
+                                    if L!=0 :
+                                        
+                                        self.camb=True
+                                        Estado.Modificar(L,"Ensamblando")
+                                        self.cont+=1
+                                        #print(self.cont)
+                                        Ls.Modificar(L, C, P,False)
+                                        
+                                        
+                                else:
+                                    Ls.Modificar(L, C, P,True)
+                                    #self.ens=True
+                                    
+                                        
+                            else:
+                                self.rep=True
+                                Estado.Modificar(L,"No hacer nada")
+                                #print(str(L)+' En espera')
+                        except:
+                            break
+                    else:
+                        if str(P).isdigit():
+                            if int(C)<P:
+                                Ls.Modificar(L, C, P-1,E)
+                                Estado.Modificar(L,"Mover brazo - componente "+str(P-1))
+                                if str(C) == str(P-1):
+                                    if str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
+                                        Ls.Modificar(L, C, P-1,True)
+                            else:
+                                Ls.Modificar(L, C, P+1,E)
+                                Estado.Modificar(L,"Mover brazo - componente "+str(P+1))
+                                if str(C) == str(P+1):
+                                    if str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
+                                        Ls.Modificar(L, C, P+1,True)
+                        else:
+                            break  
+
+            if self.cont!=lim:
+                time+=1
+                print("Tiempo "+str(time)+"s")     
+                if self.camb==True:
+                    self.camb=False
+                    self.ens=self.rep
+                    self.rep=False               
+                Ls.mostrar()
+                Estado.mostrar()
+                #Ls.imp(anterior,n)
+
+                self.tiempo.config(text=str(time)+"s")

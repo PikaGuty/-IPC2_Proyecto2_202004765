@@ -104,6 +104,15 @@ class ColaProd():
 
         print('Null')
 
+    def long(self):
+        tNode = self.primero 
+        c=0
+        while tNode != None:
+            c+=1
+            tNode = tNode.sig
+        return c
+            
+
     def retornar_seleccionado(self, n):
         tNode = self.primero 
         c=1

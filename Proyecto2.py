@@ -1,17 +1,25 @@
 from tkinter import *
 from tkinter import ttk
 from typing import Sized
+from xml.etree.ElementTree import ProcessingInstruction
 from PIL import ImageTk, Image
 from tkinter import filedialog as FileDialog
 from Analizar_Maquina import AMaquina
 from Analizar_Simulacion import ASimulacion
+from ListaSeleccionados import ColaS, nodoS
+from ListaEstado import ColaE, nodoE
 import time
+import subprocess
 import threading
 
 class app():
     def __init__(self):
         self.root = Tk()
         self.rut1=''
+        
+        self.rep=False
+        self.camb=False
+        self.cont=0
         
         #Configurando ventana
         self.root.title("DIGITAL INTELLIGENCE S.A.")
@@ -63,40 +71,54 @@ class app():
         tab1 = Frame(self.tabControl)
         tab1.config(bg="#1D1E1B", width=635, height=525)
         
-        Label(tab1, text="Reporte HTML: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=10)
+        Label(tab1, text="Reporte XML: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=10)
         #componentes
         componentes = Frame(tab1)
         scrollbarY = ttk.Scrollbar(componentes,orient=VERTICAL)
         scrollbarX = ttk.Scrollbar(componentes,orient=HORIZONTAL)
-        self.listbox = Listbox(componentes, width=32, height=9, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
-        for i in range(20):
-            self.listbox.insert(END, "Elementoooooooooooooooooooooooooooooooo {}".format(i))
-        scrollbarY.config(command=self.listbox.yview)
+        self.LRXML = Listbox(componentes, width=32, height=4, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
+        #for i in range(20):
+            #self.LRXML.insert(END, "Elementoooooooooooooooooooooooooooooooo {}".format(i))
+        scrollbarY.config(command=self.LRXML.yview)
         scrollbarY.pack(side=RIGHT, fill=Y)
-        scrollbarX.config(command=self.listbox.xview)
+        scrollbarX.config(command=self.LRXML.xview)
         scrollbarX.pack(side=BOTTOM, fill=X)
-        self.listbox.pack()
+        self.LRXML.pack()
         componentes.place(x=10,y=40)
 
-
-        Label(tab1, text="Reporte de cola de secuencia: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=275)
+        Label(tab1, text="Reporte HTML: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=180)
         #componentes
         componentes = Frame(tab1)
         scrollbarY = ttk.Scrollbar(componentes,orient=VERTICAL)
         scrollbarX = ttk.Scrollbar(componentes,orient=HORIZONTAL)
-        self.listbox = Listbox(componentes, width=32, height=9, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
-        for i in range(20):
-            self.listbox.insert(END, "Elementoooooooooooooooooooooooooooooooo {}".format(i))
-        scrollbarY.config(command=self.listbox.yview)
+        self.LRHTML = Listbox(componentes, width=32, height=4, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
+        #for i in range(20):
+            #self.LRHTML.insert(END, "Elementoooooooooooooooooooooooooooooooo {}".format(i))
+        scrollbarY.config(command=self.LRHTML.yview)
         scrollbarY.pack(side=RIGHT, fill=Y)
-        scrollbarX.config(command=self.listbox.xview)
+        scrollbarX.config(command=self.LRHTML.xview)
         scrollbarX.pack(side=BOTTOM, fill=X)
-        self.listbox.pack()
-        componentes.place(x=10,y=305)
-
+        self.LRHTML.pack()
+        componentes.place(x=10,y=210)
         
-        Button(tab1,text='Generar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold")).place(x=450,y=130)
-        Button(tab1,text='Generar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold")).place(x=450,y=400)
+        Label(tab1, text="Reporte Graphviz: ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=10,y=350)
+        #componentes
+        componentes = Frame(tab1)
+        scrollbarY = ttk.Scrollbar(componentes,orient=VERTICAL)
+        scrollbarX = ttk.Scrollbar(componentes,orient=HORIZONTAL)
+        self.LRGraph = Listbox(componentes, width=32, height=4, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set, bg="#1D1E1B", fg="#D90808",font=("Fixedsys", 14, "bold"))
+        #for i in range(20):
+            #self.LRGraph.insert(END, "Elementoooooooooooooooooooooooooooooooo {}".format(i))
+        scrollbarY.config(command=self.LRGraph.yview)
+        scrollbarY.pack(side=RIGHT, fill=Y)
+        scrollbarX.config(command=self.LRGraph.xview)
+        scrollbarX.pack(side=BOTTOM, fill=X)
+        self.LRGraph.pack()
+        componentes.place(x=10,y=380)
+        
+        Button(tab1,text='Generar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"), command=lambda: self.genXML()).place(x=460,y=80)
+        Button(tab1,text='Generar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"), command=lambda: self.genHTML()).place(x=460,y=245)
+        Button(tab1,text='Generar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"), command=lambda: self.genGraph()).place(x=460,y=410)
         self.tabControl.add(tab1, text = 'Reportes')
 
     def Proceso(self,img):
@@ -147,13 +169,15 @@ class app():
         self.listEnsam.pack()
         componentes.place(x=250,y=210)
 
-        self.pb = ttk.Progressbar(tab1,orient='horizontal',mode='determinate',length=230).place(x=10,y=350)
+        self.pb = ttk.Progressbar(tab1,orient='horizontal',mode='determinate',length=230, maximum=100)
+        self.pb.place(x=10,y=350)
 
         tabimg = Canvas(tab1,width=100,height=100, bg="black")
         tabimg.create_image(0,0,image=img,anchor="nw")
         tabimg.place(x=10,y=400)
 
-        self.tiempo=Label(tab1, text="tiempo ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold")).place(x=120,y=440)
+        self.tiempo=Label(tab1, text="tiempo ", wraplength=890,fg="#D90808", bg="#1D1E1B", font=("Fixedsys", 14, "bold"))
+        self.tiempo.place(x=120,y=440)
 
         self.hilo1 = threading.Thread(target=self.Simulacion)
         
@@ -271,9 +295,19 @@ class app():
             while ConfMaq.getListProductos().retornar_seleccionado(j) != None:
                 if simulacion.getListP().retornar_seleccionado(i).getNombre() == ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
                     Simular=True
+                    #Insertando componentes a la lista de ensamblaje
                     self.listEnsam.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    #Cambiando label por producto que se está trabajando
                     self.Producto.config(text=ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    #Insertando componentes a la lista de Productos
                     self.listComponentes.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    #Insertando componentes a la lista de XML
+                    self.LRXML.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    #Insertando componentes a la lista de HTML
+                    self.LRHTML.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    #Insertando componentes a la lista de Graficas
+                    self.LRGraph.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                    
                     print(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
                     c2=ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
                     
@@ -290,21 +324,152 @@ class app():
             i+=1
 
     def armar(self,n,cola):
-        print("Numero de Lineas "+n) 
-        
+        print("Numero de Lineas "+n)
+        colaaa=cola 
+        ListaSelec=ColaS()
+        Estado=ColaE()
         x=1
-
+        L=0
+        C=0
         for x in range(int(n)+1):
             k=1  
-            while cola.retornar_seleccionado(k) != None:
-                if x == int(cola.retornar_seleccionado(k).getLinea()):
-                    print("Linea {} Componente {}".format(cola.retornar_seleccionado(k).getLinea(),cola.retornar_seleccionado(k).getComponente()))
+            while colaaa.retornar_seleccionado(k) != None:
+                if x == int(colaaa.retornar_seleccionado(k).getLinea()):
+                    L=colaaa.retornar_seleccionado(k).getLinea()
+                    C=colaaa.retornar_seleccionado(k).getComponente()
+                    print("Linea {} Componente {}".format(colaaa.retornar_seleccionado(k).getLinea(),colaaa.retornar_seleccionado(k).getComponente()))
                     break
                 k+=1 
-            
+            if L!=0:
+                ListaSelec.insertar(nodoS(L,C,0,False))
+                Estado.insertar(nodoE(L,'Iniciando'))
+                
 
-    def recorrer():
-        componente=0
+
+        self.recorrer(ListaSelec,colaaa,n,Estado)
+            
+    def genHTML(self):
+        for i in self.LRHTML.curselection():
+            print(self.LRHTML.get(i))
+
+    def genXML(self):
+        for i in self.LRXML.curselection():
+            print(self.LRXML.get(i))
+
+    def genGraph(self):
+        ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
+        ConfMaq=ObjMaquina.retornar_seleccionado(1)
+        for i in self.LRGraph.curselection():
+            print(self.LRGraph.get(i))
+            j=1
+            while ConfMaq.getListProductos().retornar_seleccionado(j) != None:
+                if self.LRGraph.get(i) == ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
+                    c2=ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
+                    k=1
+                    contenido='digraph G {rankdir=LR '
+                    while c2.retornar_seleccionado(k) != None:
+                        if c2.retornar_seleccionado(k+1) != None:
+                            contenido+='L{}C{} ->'.format(c2.retornar_seleccionado(k).getLinea(),c2.retornar_seleccionado(k).getComponente())
+                        else:
+                            contenido+='L{}C{}'.format(c2.retornar_seleccionado(k).getLinea(),c2.retornar_seleccionado(k).getComponente())
+                        k+=1   
+                    contenido+='}'
+                    f = open ('img.txt','w')
+                
+                    f.write(contenido)
+                    f.close()
+                    subprocess.run('bin\dot.exe -Tpng img.txt -o {}.png'.format(self.LRGraph.get(i)))
+                    print("Imagen generada")
+                j+=1
+
+    def recorrer(self, Ls, colaE,n,Estado):
+        self.tiempo.config(text="0s")
+        tiempo=0
+        self.cont=0
+        cambio=False
+        
+        self.lim=colaE.long()
+
+        prog = threading.Thread(target=self.progreso)
+        prog.start()
+
+        while colaE.retornar_seleccionado(1)!=None:
+            cambio=False
+            for c in range(1,int(n)+1,1):
+                L=Ls.retornar_seleccionado(c).getLinea()
+                C=Ls.retornar_seleccionado(c).getComponente()
+                P=Ls.retornar_seleccionado(c).getPosicion()
+                es=Ls.retornar_seleccionado(c).getEstado()
+                
+                if int(C) == int(P):
+                    try:
+                        if str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
+                            k=1
+                            if es==True:
+                                colaE.EliminarP()
+                                
+                                while colaE.retornar_seleccionado(k) != None:
+                                    if int(L) == int(colaE.retornar_seleccionado(k).getLinea()):
+                                        C=colaE.retornar_seleccionado(k).getComponente()
+                                        
+                                    k+=1
+                                
+                                if L!=0 :
+                                    cambio=True
+                                    Estado.Modificar(L,"Ensamblando componente "+str(C))
+                                    self.cont+=1
+                                    Ls.Modificar(L, C, P,False)
+                            else:
+                                Ls.Modificar(L, C, P,True)
+                        else:
+                            self.rep=True
+                            Estado.Modificar(L,"No hacer nada")
+                    except:
+                        pass
+                else:
+                    if str(P).isdigit():
+                        if int(C)<int(P):
+                            Ls.Modificar(L, C, P-1,es)
+                            Estado.Modificar(L,"Mover brazo - componente "+str(P-1))
+                            if int(C) == int(P-1) and str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
+                                Ls.Modificar(L, C, P-1,True)
+                        else:
+                            Ls.Modificar(L, C, P+1,es)
+                            Estado.Modificar(L,"Mover brazo - componente "+str(P+1))
+                            if int(C) == int(P+1) and str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
+                                Ls.Modificar(L, C, P+1,True)
+            
+                if cambio==True:
+                    cambio=False
+                    Ls.Modificar(L, C, P,self.rep)
+                    self.rep=False 
+           
+            
+            if self.cont<=self.lim:
+                
+                tiempo+=1
+                print("Tiempo "+str(tiempo)+"s")   
+                self.listEnsam.insert(END, "Tiempo "+str(tiempo)+"s")
+                Ls.mostrar()
+                
+                Estado.mostrar(self.listEnsam)
+                #colaE.mostrar()
+                #Ls.imp(anterior,n)
+
+                self.tiempo.config(text=str(tiempo)+"s")
+                time.sleep(1)
+        
+
+    def progreso(self):
+        while True:
+            self.pb.step((self.cont/self.lim)*100)
+            time.sleep(1)
+            if (self.cont/self.lim)*100==100:
+                self.pb.step(99.99)
+                time.sleep(1)
+                break
+            
+            
 
     #***************************************************************************
 app()
