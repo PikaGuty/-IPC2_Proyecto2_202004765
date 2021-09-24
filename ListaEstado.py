@@ -1,4 +1,7 @@
 import tkinter as tk
+import xml.etree.cElementTree as ET
+from xml.dom import minidom
+
 class nodoE():
     def __init__(self,linea,estado):
         self.linea = linea
@@ -59,8 +62,22 @@ class ColaE():
             print("Linea "+str(tNode.getLinea())+" "+str(tNode.getEstado()))
             listEnsam.insert(tk.END, "Linea "+str(tNode.getLinea())+" "+str(tNode.getEstado()))
             tNode = tNode.sig
+ 
+    def mostrarHTML(self):
+        #<th scope="col">First</th>
+        tNode = self.primero
+        col=""
+        while tNode != None:
+            col+="<td>"+str(tNode.getEstado()+"</td>\n")
+            tNode = tNode.sig
+        return col
 
-      
+    def mostrarXML(self,LineaEnsamblaje):
+        #<th scope="col">First</th>
+        tNode = self.primero
+        while tNode != None:
+            ET.SubElement(LineaEnsamblaje, "LineaEnsamblaje", NoLinea=str(tNode.getLinea())).text=str(tNode.getEstado())
+            tNode = tNode.sig
 
     def Modificar(self, L, E):
         tNode = self.primero 

@@ -1,7 +1,10 @@
+from os import system
 from tkinter import *
 from tkinter import ttk
 from typing import Sized
 from xml.etree.ElementTree import ProcessingInstruction
+import xml.etree.cElementTree as ET
+from xml.dom import minidom
 from PIL import ImageTk, Image
 from tkinter import filedialog as FileDialog
 from Analizar_Maquina import AMaquina
@@ -50,7 +53,7 @@ class app():
         Cmenu = Menu(menubar)
         Cmenu.add_command(label="Archivo de configuración", command=self.BusArchvivoConfig)
         Cmenu.add_command(label="Archivo de simulación", command=self.BusArchvivoSimul)
-        Cmenu.add_command(label="Salir")
+        Cmenu.add_command(label="Salir",command=exit)
         menubar.add_cascade(label="Cargar", menu=Cmenu)
 
         #Menú Ayuda
@@ -180,8 +183,8 @@ class app():
         self.tiempo.place(x=120,y=440)
 
         self.hilo1 = threading.Thread(target=self.Simulacion)
-        
-        Button(tab1,text='Iniciar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"), command=lambda: self.hilo1.start()).place(x=530,y=160)
+
+        Button(tab1,text='Iniciar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"), command=self.hilo1.start).place(x=530,y=160)
 
         self.tabControl.add(tab1, text = 'Proceso')
 
@@ -247,7 +250,6 @@ class app():
         
         Button(win,text='Aceptar',fg="#FFFFFF", bg="#D90808", font=("Fixedsys", 14, "bold"),command=win.destroy).place(x=210,y=100)
 
-
     def BusArchvivoSimul(self):
         win = Toplevel()
         win.wm_title("Window")
@@ -271,60 +273,112 @@ class app():
         self.Rutaa2.config(text=ruta)
 
     def Simulacion(self):
-        print(self.Rutaa1.cget("text"))
-        print(self.Rutaa2.cget("text"))
-        ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
-        simulacion=ASimulacion.AnalizarArchivoS(self.Rutaa2.cget("text"))
-
-        #************************** Configuracion Maquina **************************
         
-        print('Nombre: '+simulacion.getNombreS())
-        self.listEnsam.insert(END, "Nombre: {}".format(simulacion.getNombreS()))
+        while self.Rutaa1.cget("text")!="..." and self.Rutaa2.cget("text")!="...":
+            self.HTML=''
+            print(self.Rutaa1.cget("text"))
+            print(self.Rutaa2.cget("text"))
+            ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
+            simulacion=ASimulacion.AnalizarArchivoS(self.Rutaa2.cget("text"))
 
-        #************************** Configuracion Maquina **************************
-        ConfMaq=ObjMaquina.retornar_seleccionado(1)
-        print('Lineas de ensamblaje'+ConfMaq.getNoLineas())
-        liss=ConfMaq.getListLineas()
-        liss.mostrar()
-
-        i=1
-        Simular=False
-        while simulacion.getListP().retornar_seleccionado(i) != None:
-            #print(simulacion.getListP().retornar_seleccionado(i).getNombre())
-            j=1
-            while ConfMaq.getListProductos().retornar_seleccionado(j) != None:
-                if simulacion.getListP().retornar_seleccionado(i).getNombre() == ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
-                    Simular=True
-                    #Insertando componentes a la lista de ensamblaje
-                    self.listEnsam.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    #Cambiando label por producto que se está trabajando
-                    self.Producto.config(text=ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    #Insertando componentes a la lista de Productos
-                    self.listComponentes.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    #Insertando componentes a la lista de XML
-                    self.LRXML.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    #Insertando componentes a la lista de HTML
-                    self.LRHTML.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    #Insertando componentes a la lista de Graficas
-                    self.LRGraph.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    
-                    print(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                    c2=ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
-                    
-                    k=1
-                    while c2.retornar_seleccionado(k) != None:
-                        self.listComponentes.insert(END, "Linea {} Columna {}".format(c2.retornar_seleccionado(k).getLinea(),c2.retornar_seleccionado(k).getComponente()))
-                        k+=1
-                    self.armar(ConfMaq.getNoLineas(),c2)
-                j+=1
+            #************************** Configuracion Maquina **************************
             
-            if Simular:
-                self.Finalizado(simulacion.getListP().retornar_seleccionado(i).getNombre())
-                time.sleep(2)
-            i+=1
+            print('Nombre: '+simulacion.getNombreS())
+            self.listEnsam.insert(END, "Nombre: {}".format(simulacion.getNombreS()))
+            #Insertando XML
+            
+            self.SalidaXML = ET.Element("SalidaSimulacion")
+            self.NomXML = ET.SubElement(self.SalidaXML, "Nombre").text=str(simulacion.getNombreS())
+            self.ListProductos = ET.SubElement(self.SalidaXML, "ListadoProductos")
+            #Insertando componentes a la lista de HTML
+            self.LRHTML.insert(END, simulacion.getNombreS())
+            #Insertando componentes a la lista de XML
+            self.LRXML.insert(END, simulacion.getNombreS())
+                       
+            self.NombreSimulacion=simulacion.getNombreS()
+            self.HTML+='''<html lang="en">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <title>{}</title>
+                <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+                <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet" />
+                <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+                <link href="css/styles.css" rel="stylesheet" />
+            </head>
 
+            <body id="page-top">
+                <header class="masthead d-flex align-items-center">
+                    <div class="container px-4 px-lg-5 text-center">
+                        <h1 class="mb-1">{}</h1>
+                    </div>
+                </header>
+                <section class="content-section bg-light" id="about">
+                    <div class="container px-4 px-lg-5 text-center">'''.format(simulacion.getNombreS(),simulacion.getNombreS())
+
+            #************************** Configuracion Maquina **************************
+            ConfMaq=ObjMaquina.retornar_seleccionado(1)
+            print('Lineas de ensamblaje'+ConfMaq.getNoLineas())
+            liss=ConfMaq.getListLineas()
+            liss.mostrar()
+
+            i=1
+            Simular=False
+            while simulacion.getListP().retornar_seleccionado(i) != None:
+                #print(simulacion.getListP().retornar_seleccionado(i).getNombre())
+                j=1
+                while ConfMaq.getListProductos().retornar_seleccionado(j) != None:
+                    if simulacion.getListP().retornar_seleccionado(i).getNombre() == ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
+                        Simular=True
+                        #Insertando componentes a la lista de ensamblaje
+                        self.listEnsam.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.HTML+='<br><h1>{}</h1><br>\n<table class="table table-striped table-dark">'.format(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.ProductoXML=ET.SubElement(self.ListProductos, "Producto")
+                        ET.SubElement(self.ProductoXML, "Nombre").text=str(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.ElabOptima=ET.SubElement(self.ProductoXML, "ElaboracionOptima")
+                        #Cambiando label por producto que se está trabajando
+                        self.Producto.config(text=ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        #Insertando componentes a la lista de Productos
+                        self.listComponentes.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        
+                        #Insertando componentes a la lista de Graficas
+                        self.LRGraph.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        
+                        print(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        c2=ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
+                        
+                        k=1
+                        while c2.retornar_seleccionado(k) != None:
+                            self.listComponentes.insert(END, "Linea {} Columna {}".format(c2.retornar_seleccionado(k).getLinea(),c2.retornar_seleccionado(k).getComponente()))
+                            k+=1
+                        self.armar(ConfMaq.getNoLineas(),c2)
+                    j+=1
+                
+                if Simular:
+                    self.Finalizado(simulacion.getListP().retornar_seleccionado(i).getNombre())
+                    time.sleep(2)
+                i+=1
+            self.HTML+="</div></section>"
+            self.HTML+='''<a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+                            <script src="js/scripts.js"></script>
+                        </body>
+                    </html>'''
+            f = open(self.NombreSimulacion+'.html','w')
+            f.write(self.HTML)
+            f.close()
+            break
+        
     def armar(self,n,cola):
         print("Numero de Lineas "+n)
+        self.NLineas=n
+        self.HTML+='<thead><tr>'
+        for x in range(1,int(n)+1):
+            self.HTML+='<th scope="col">{}</th>'.format('Linea '+str((int(x))))
+        self.HTML+='</tr>\n</thead>\n<tbody>\n'
         colaaa=cola 
         ListaSelec=ColaS()
         Estado=ColaE()
@@ -347,14 +401,16 @@ class app():
 
 
         self.recorrer(ListaSelec,colaaa,n,Estado)
-            
+             
     def genHTML(self):
         for i in self.LRHTML.curselection():
             print(self.LRHTML.get(i))
-
+            system('{}.html'.format(str(self.LRHTML.get(i))))
+            
     def genXML(self):
         for i in self.LRXML.curselection():
             print(self.LRXML.get(i))
+            system('{}.xml'.format(str(self.LRHTML.get(i))))
 
     def genGraph(self):
         ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
@@ -381,6 +437,7 @@ class app():
                     subprocess.run('bin\dot.exe -Tpng img.txt -o {}.png'.format(self.LRGraph.get(i)))
                     print("Imagen generada")
                 j+=1
+        system('{}.png'.format(str(self.LRGraph.get(i)))) 
 
     def recorrer(self, Ls, colaE,n,Estado):
         self.tiempo.config(text="0s")
@@ -392,6 +449,8 @@ class app():
 
         prog = threading.Thread(target=self.progreso)
         prog.start()
+
+        self.HTML+=''
 
         while colaE.retornar_seleccionado(1)!=None:
             cambio=False
@@ -432,7 +491,7 @@ class app():
                             Ls.Modificar(L, C, P-1,es)
                             Estado.Modificar(L,"Mover brazo - componente "+str(P-1))
                             if int(C) == int(P-1) and str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
-                                Ls.Modificar(L, C, P-1,True)
+                                Ls.Modificar(L, C, P-1,True) 
                         else:
                             Ls.Modificar(L, C, P+1,es)
                             Estado.Modificar(L,"Mover brazo - componente "+str(P+1))
@@ -449,17 +508,35 @@ class app():
                 
                 tiempo+=1
                 print("Tiempo "+str(tiempo)+"s")   
-                self.listEnsam.insert(END, "Tiempo "+str(tiempo)+"s")
+                self.listEnsam.insert(END, "* Tiempo "+str(tiempo)+"s")
+                self.TiempoXML=ET.SubElement(self.ElabOptima, "Tiempo", NoSegundo=str(tiempo))
+                #ET.SubElement(self.TiempoXML, "LineaEnsamblaje", NoLinea=str(tiempo)).text=str()
                 Ls.mostrar()
+                self.HTML+='''<tr class="bg-primary">
+                <td colspan="{}">{}</td>
+                </tr>'''.format(str(self.NLineas),"Tiempo "+str(tiempo)+"s")
+                #self.NLineas
                 
                 Estado.mostrar(self.listEnsam)
+               
+                self.HTML+=Estado.mostrarHTML()
+                self.HTML+='</tr>'
+                Estado.mostrarXML(self.TiempoXML)
                 #colaE.mostrar()
                 #Ls.imp(anterior,n)
 
                 self.tiempo.config(text=str(tiempo)+"s")
                 time.sleep(1)
+        self.HTML+='</tbody></table>'
+        self.listEnsam.insert(END, "")
+        self.listEnsam.insert(END, "*********************************")
+        self.listEnsam.insert(END, "")
+        ET.SubElement(self.ProductoXML, "TiempoTotal").text=str(tiempo)
+        xmlstr = minidom.parseString(ET.tostring(self.SalidaXML)).toprettyxml(indent="   ")
+        with open(str(self.NombreSimulacion)+".xml", "w") as f:
+            f.write(xmlstr)
+        prog.join()
         
-
     def progreso(self):
         while True:
             self.pb.step((self.cont/self.lim)*100)
@@ -472,4 +549,6 @@ class app():
             
 
     #***************************************************************************
+  
+
 app()

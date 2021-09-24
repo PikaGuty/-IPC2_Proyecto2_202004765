@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<SalidaSimulacion>
+   <Nombre>prueba2</Nombre>
+   <ListadoProductos>
+      <Producto>
+         <Nombre>USBStick</Nombre>
+         <ElaboracionOptima>
+            <Tiempo NoSegundo="1">
+               <LineaEnsamblaje NoLinea="1">Mover brazo - componente 1</LineaEnsamblaje>
+               <LineaEnsamblaje NoLinea="2">Mover brazo - componente 1</LineaEnsamblaje>
+            </Tiempo>
+            <Tiempo NoSegundo="2">
+               <LineaEnsamblaje NoLinea="1">Ensamblando componente 1</LineaEnsamblaje>
+               <LineaEnsamblaje NoLinea="2">Mover brazo - componente 2</LineaEnsamblaje>
+            </Tiempo>
+            <Tiempo NoSegundo="3">
+               <LineaEnsamblaje NoLinea="1">No hacer nada</LineaEnsamblaje>
+               <LineaEnsamblaje NoLinea="2">Mover brazo - componente 3</LineaEnsamblaje>
+            </Tiempo>
+            <Tiempo NoSegundo="4">
+               <LineaEnsamblaje NoLinea="1">No hacer nada</LineaEnsamblaje>
+               <LineaEnsamblaje NoLinea="2">Ensamblando componente 3</LineaEnsamblaje>
+            </Tiempo>
+         </ElaboracionOptima>
+         <TiempoTotal>4</TiempoTotal>
+      </Producto>
+   </ListadoProductos>
+</SalidaSimulacion>
