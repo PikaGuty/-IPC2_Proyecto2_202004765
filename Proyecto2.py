@@ -401,10 +401,16 @@ class app():
                     break
                 k+=1 
             if L!=0:
-                t=self.ConfMaq.getListLineas().retornar_seleccionado(x).getTEnsamblaje()
-                print(t)
-                ListaSelec.insertar(nodoS(L,C,0,False,t))
-                Estado.insertar(nodoE(L,'Iniciando'))
+                if int(L)==int(x):
+                    t=self.ConfMaq.getListLineas().retornar_seleccionado(x).getTEnsamblaje()
+                    print(t)
+                    ListaSelec.insertar(nodoS(L,C,0,False,t))
+                    Estado.insertar(nodoE(L,'Iniciando'))
+                else:
+                    t=self.ConfMaq.getListLineas().retornar_seleccionado(x).getTEnsamblaje()
+                    print(t)
+                    ListaSelec.insertar(nodoS(x,C,0,False,t))
+                    Estado.insertar(nodoE(x,'No se usa'))
                 
 
 
@@ -521,7 +527,7 @@ class app():
             
                 if cambio==True:
                     cambio=False
-                    Ls.Modificar(L, C, P,es,TT)
+                    Ls.Modificar(L, C, P,self.rep,TT)
                     self.rep=False 
            
             

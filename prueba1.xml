@@ -61,10 +61,14 @@
             </Tiempo>
             <Tiempo NoSegundo="6">
                <LineaEnsamblaje NoLinea="1">Ensamblando componente 4</LineaEnsamblaje>
+               <LineaEnsamblaje NoLinea="2">Mover brazo - componente 2</LineaEnsamblaje>
+            </Tiempo>
+            <Tiempo NoSegundo="7">
+               <LineaEnsamblaje NoLinea="1">No hacer nada</LineaEnsamblaje>
                <LineaEnsamblaje NoLinea="2">Ensamblando componente 2</LineaEnsamblaje>
             </Tiempo>
          </ElaboracionOptima>
-         <TiempoTotal>6</TiempoTotal>
+         <TiempoTotal>7</TiempoTotal>
       </Producto>
    </ListadoProductos>
 </SalidaSimulacion>
