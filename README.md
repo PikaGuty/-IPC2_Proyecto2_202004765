@@ -14,7 +14,7 @@ Para de ultimo poder crear reportes en formato XML y HTML acerca del proceso que
 
 **XML:** es un lenguaje de marcado similar a HTML. Significa Extensible Markup Language (Lenguaje de Marcado Extensible) y es una especificación de W3C como lenguaje de marcado de propósito general. ... El propósito principal del lenguaje es compartir datos a través de diferentes sistemas, como Internet.
 
-**HTML: **(Lenguaje de Marcas de Hipertexto, del inglés HyperText Markup Language) es el componente más básico de la Web. Define el significado y la estructura del contenido web.
+**HTML: ** (Lenguaje de Marcas de Hipertexto, del inglés HyperText Markup Language) es el componente más básico de la Web. Define el significado y la estructura del contenido web.
 
 **CSS:** (Hojas de estilo en cascada), es un lenguaje de diseño gráfico para definir y crear la presentación de un documento estructurado escrito en un lenguaje de marcado.
 
