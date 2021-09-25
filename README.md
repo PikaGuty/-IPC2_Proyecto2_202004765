@@ -3,13 +3,21 @@ Utilizando las estructuras de datos abstractas, se realizó un programa para sim
 Para de ultimo poder crear reportes en formato XML y HTML acerca del proceso que se llevó a cabo para la simulación seleccionada, también creando imágenes de la cola de componentes utilizada para cada producto que se simuló.
 
 **TDA:** En ciencias de la computación un tipo de dato abstracto o tipo abstracto de datos es un modelo matemático compuesto por una colección de operaciones definidas sobre un conjunto de datos para el modelo.
+
 **Cola: **Una cola es una estructura de datos, caracterizada por ser una secuencia de elementos en la que la operación de inserción push se realiza por un extremo y la operación de extracción pull por el otro. También se le llama estructura FIFO, debido a que el primer elemento en entrar será también el primero en salir.
+
 **Lista enlazada simple:** es una estructura de datos en la que cada elemento apunta al siguiente. De este modo, teniendo la referencia del principio de la lista podemos acceder a todos los elementos de la misma.
+
 **Expresiones Regulares:** son patrones que se utilizan para hacer coincidir combinaciones de caracteres en cadenas.
+
 **Autómata Finito:** es un modelo computacional que realiza cómputos en forma automática sobre una entrada para producir una salida. Este modelo está conformado por un alfabeto, un conjunto de estados finito, una función de transición, un estado inicial y un conjunto de estados finales.
+
 **XML:** es un lenguaje de marcado similar a HTML. Significa Extensible Markup Language (Lenguaje de Marcado Extensible) y es una especificación de W3C como lenguaje de marcado de propósito general. ... El propósito principal del lenguaje es compartir datos a través de diferentes sistemas, como Internet.
+
 **HTML: **(Lenguaje de Marcas de Hipertexto, del inglés HyperText Markup Language) es el componente más básico de la Web. Define el significado y la estructura del contenido web.
+
 **CSS:** (Hojas de estilo en cascada), es un lenguaje de diseño gráfico para definir y crear la presentación de un documento estructurado escrito en un lenguaje de marcado.
+
 **Hilo:** es simplemente una tarea que puede ser ejecutada al mismo tiempo que otra tarea.
 
 
