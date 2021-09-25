@@ -19,10 +19,11 @@ Durante la ejecución del programa que se realiza desde un hilo se podrá apreci
 
 Imagen de diagrama de clases empleado
 
+user-images.githubusercontent.com/78063271/134774031-ea2afa82-85e0-4b88-b6eb-2546e857351a.png)
 
-<img width="512" alt="Untitled Diagram" src="https://user-images.githubusercontent.com/78063271/134774028-89afc696-9eae-4818-b789-595cebd7c408.png">
 
 Imagen del diagrama del arbol para procesar la expresion regular
 
 
-![Untitled Diagram drawio](https://user-images.githubusercontent.com/78063271/134774031-ea2afa82-85e0-4b88-b6eb-2546e857351a.png)
+![Untitled Diagram drawio](https://![IPC2P2 (1)_page-0001](https://user-images.githubusercontent.com/78063271/134774114-aa8f7b42-f2a9-4915-8605-1d85be2f6007.jpg)
+
