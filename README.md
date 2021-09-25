@@ -18,7 +18,11 @@ Continuando con pasar la lista de componentes obtenida por un Autómata finito p
 Durante la ejecución del programa que se realiza desde un hilo se podrá apreciar la actualización en tiempo real de los movimientos de los brazos al ensamblar. Al final se pueden generar graficas utilizando Graphviz para diagramar la cola de cada producto en la simulación, además de generar reportes en HTML y XML de los movimientos que se ejecutaron para ensamblar el producto.
 
 Imagen de diagrama de clases empleado
+
+
 <img width="512" alt="Untitled Diagram" src="https://user-images.githubusercontent.com/78063271/134774028-89afc696-9eae-4818-b789-595cebd7c408.png">
 
 Imagen del diagrama del arbol para procesar la expresion regular
+
+
 ![Untitled Diagram drawio](https://user-images.githubusercontent.com/78063271/134774031-ea2afa82-85e0-4b88-b6eb-2546e857351a.png)
