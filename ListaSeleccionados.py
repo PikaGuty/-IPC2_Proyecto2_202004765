@@ -1,9 +1,10 @@
 class nodoS():
-    def __init__(self,linea,componente,posicion,estado):
+    def __init__(self,linea,componente,posicion,estado,tE):
         self.linea = linea
         self.componente = componente
         self.posicion = posicion
         self.estado=estado
+        self.tE=tE
         self.sig = None
 
     #Métodos GET
@@ -19,6 +20,9 @@ class nodoS():
     def getEstado(self):
         return self.estado
 
+    def getTE(self):
+        return self.tE
+
     #Métodos SET
     def setLinea(self,linea):
         self.linea = linea
@@ -31,6 +35,9 @@ class nodoS():
 
     def setEstado(self,estado):
         self.estado = estado
+
+    def setTE(self, tE):
+        self.tE = tE
     
     def setSig(self,sig):
         self.sig = sig
@@ -51,7 +58,7 @@ class ColaS():
     def mostrar(self):
         tNode = self.primero
         while tNode != None:
-            print('('+str(tNode.getLinea())+','+str(tNode.getComponente())+','+str(tNode.getPosicion())+','+str(tNode.getEstado())+')', end='<-')
+            print('('+str(tNode.getLinea())+','+str(tNode.getComponente())+','+str(tNode.getPosicion())+','+str(tNode.getEstado())+','+str(tNode.getTE())+')', end='<-')
             tNode = tNode.sig
 
         print('Null')
@@ -59,7 +66,6 @@ class ColaS():
     def imp(self, anterior,n):
         tNode = self.primero
         
-
         for cc in range(int(n)+1):
             if cc!=0:
                 L=anterior.retornar_seleccionado(cc).getLinea()
@@ -72,9 +78,6 @@ class ColaS():
                         print('Linea de ensamblaje '+str(tNode.getLinea())+' mover brazo '+str(tNode.getPosicion())+'')
                     tNode = tNode.sig
         
-
-        
-
     def retornar_seleccionado(self, n):
         tNode = self.primero 
         c=1
@@ -93,7 +96,7 @@ class ColaS():
             self.primero = None
             self.primero=tNode
 
-    def Modificar(self, L, C, P, E):
+    def Modificar(self, L, C, P, E, T):
         tNode = self.primero 
         x=1
         while tNode != None:
@@ -102,6 +105,8 @@ class ColaS():
                 tNode.setComponente(C)
                 tNode.setPosicion(P)
                 tNode.setEstado(E)
+                tNode.setTE(T)
+                #print('Modificao '+str(tNode.getTE()))
                 #print('('+str(tNode.getLinea())+','+str(tNode.getComponente())+')')
                 return tNode
             tNode = tNode.sig

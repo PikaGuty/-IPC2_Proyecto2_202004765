@@ -4,7 +4,7 @@ from Obj_Lineas import Obj_Linea, Lista_Lineas
 from Obj_Maquina import Obj_Maquina, Lista_Maquina
 
 listaP=Lista_Productos()
-listaL=Lista_Lineas()
+listaL=Lista_Lineas() 
 listaLineas=Lista_Maquina()
 
 class AMaquina:

@@ -58,6 +58,15 @@ class Lista_Lineas():
             tNode = tNode.sig
             c+=1
 
+    def tiempoE(self, L,t):
+        tNode = self.primero 
+        c=1
+        while tNode != None:
+            if L is tNode.getNLinea():
+                return tNode.getTEnsamblaje()
+            tNode = tNode.sig
+            c+=1
+
     def EliminarP(self):
         tNode = self.primero
         if tNode is None:

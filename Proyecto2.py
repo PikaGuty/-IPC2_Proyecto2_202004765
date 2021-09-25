@@ -1,3 +1,4 @@
+
 from os import system
 from tkinter import *
 from tkinter import ttk
@@ -278,8 +279,12 @@ class app():
             self.HTML=''
             print(self.Rutaa1.cget("text"))
             print(self.Rutaa2.cget("text"))
-            ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
+            self.ObjMaquina=AMaquina.AnalizarArchivoM(self.Rutaa1.cget("text"))
             simulacion=ASimulacion.AnalizarArchivoS(self.Rutaa2.cget("text"))
+            #print('L1')
+            #print(ObjMaquina.retornar_seleccionado(1).getListLineas().retornar_seleccionado(1).getTEnsamblaje())
+            #print('L2')
+            #print(ObjMaquina.retornar_seleccionado(1).getListLineas().retornar_seleccionado(2).getTEnsamblaje())
 
             #************************** Configuracion Maquina **************************
             
@@ -320,9 +325,9 @@ class app():
                     <div class="container px-4 px-lg-5 text-center">'''.format(simulacion.getNombreS(),simulacion.getNombreS())
 
             #************************** Configuracion Maquina **************************
-            ConfMaq=ObjMaquina.retornar_seleccionado(1)
-            print('Lineas de ensamblaje'+ConfMaq.getNoLineas())
-            liss=ConfMaq.getListLineas()
+            self.ConfMaq=self.ObjMaquina.retornar_seleccionado(1)
+            print('Lineas de ensamblaje'+self.ConfMaq.getNoLineas())
+            liss=self.ConfMaq.getListLineas()
             liss.mostrar()
 
             i=1
@@ -330,31 +335,31 @@ class app():
             while simulacion.getListP().retornar_seleccionado(i) != None:
                 #print(simulacion.getListP().retornar_seleccionado(i).getNombre())
                 j=1
-                while ConfMaq.getListProductos().retornar_seleccionado(j) != None:
-                    if simulacion.getListP().retornar_seleccionado(i).getNombre() == ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
+                while self.ConfMaq.getListProductos().retornar_seleccionado(j) != None:
+                    if simulacion.getListP().retornar_seleccionado(i).getNombre() == self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre():
                         Simular=True
                         #Insertando componentes a la lista de ensamblaje
-                        self.listEnsam.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                        self.HTML+='<br><h1>{}</h1><br>\n<table class="table table-striped table-dark">'.format(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.listEnsam.insert(END, self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.HTML+='<br><h1>{}</h1><br>\n<table class="table table-striped table-dark">'.format(self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
                         self.ProductoXML=ET.SubElement(self.ListProductos, "Producto")
-                        ET.SubElement(self.ProductoXML, "Nombre").text=str(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        ET.SubElement(self.ProductoXML, "Nombre").text=str(self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
                         self.ElabOptima=ET.SubElement(self.ProductoXML, "ElaboracionOptima")
                         #Cambiando label por producto que se está trabajando
-                        self.Producto.config(text=ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.Producto.config(text=self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
                         #Insertando componentes a la lista de Productos
-                        self.listComponentes.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.listComponentes.insert(END, self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
                         
                         #Insertando componentes a la lista de Graficas
-                        self.LRGraph.insert(END, ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        self.LRGraph.insert(END, self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
                         
-                        print(ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
-                        c2=ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
+                        print(self.ConfMaq.getListProductos().retornar_seleccionado(j).getNombre())
+                        c2=self.ConfMaq.getListProductos().retornar_seleccionado(j).getCola()
                         
                         k=1
                         while c2.retornar_seleccionado(k) != None:
                             self.listComponentes.insert(END, "Linea {} Columna {}".format(c2.retornar_seleccionado(k).getLinea(),c2.retornar_seleccionado(k).getComponente()))
                             k+=1
-                        self.armar(ConfMaq.getNoLineas(),c2)
+                        self.armar(self.ConfMaq.getNoLineas(),c2)
                     j+=1
                 
                 if Simular:
@@ -373,6 +378,7 @@ class app():
             break
         
     def armar(self,n,cola):
+        
         print("Numero de Lineas "+n)
         self.NLineas=n
         self.HTML+='<thead><tr>'
@@ -395,7 +401,9 @@ class app():
                     break
                 k+=1 
             if L!=0:
-                ListaSelec.insertar(nodoS(L,C,0,False))
+                t=self.ConfMaq.getListLineas().retornar_seleccionado(x).getTEnsamblaje()
+                print(t)
+                ListaSelec.insertar(nodoS(L,C,0,False,t))
                 Estado.insertar(nodoE(L,'Iniciando'))
                 
 
@@ -459,27 +467,40 @@ class app():
                 C=Ls.retornar_seleccionado(c).getComponente()
                 P=Ls.retornar_seleccionado(c).getPosicion()
                 es=Ls.retornar_seleccionado(c).getEstado()
-                
+                T=int(Ls.retornar_seleccionado(c).getTE())
+                TT=0
+                if L!=0:
+                    TT=int(self.ObjMaquina.retornar_seleccionado(1).getListLineas().retornar_seleccionado(1).getTEnsamblaje())
+                print(TT)
+                #self.ConfMaq.getListLineas().retornar_seleccionado(x).getTEnsamblaje()
                 if int(C) == int(P):
                     try:
                         if str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
                             k=1
                             if es==True:
-                                colaE.EliminarP()
                                 
-                                while colaE.retornar_seleccionado(k) != None:
-                                    if int(L) == int(colaE.retornar_seleccionado(k).getLinea()):
-                                        C=colaE.retornar_seleccionado(k).getComponente()
-                                        
-                                    k+=1
-                                
-                                if L!=0 :
-                                    cambio=True
+                                if T==1:
+                                    colaE.EliminarP()
+                                    
+                                    while colaE.retornar_seleccionado(k) != None:
+                                        if int(L) == int(colaE.retornar_seleccionado(k).getLinea()):
+                                            C=colaE.retornar_seleccionado(k).getComponente()
+                                            
+                                        k+=1
+                                    
+                                    if L!=0 :
+                                        cambio=True
+                                        Estado.Modificar(L,"Ensamblando componente "+str(C))
+                                        self.cont+=1
+                                        #print('asas'+self.ObjMaquina.retornar_seleccionado(1).getListLineas().retornar_seleccionado(L).getTEnsamblaje())
+                                        Ls.Modificar(L, C, P,False,TT)
+                                        print("aqui")
+                                else:
+                                    Ls.Modificar(L, C, P,True,(int(T)-1))
                                     Estado.Modificar(L,"Ensamblando componente "+str(C))
-                                    self.cont+=1
-                                    Ls.Modificar(L, C, P,False)
+                                    
                             else:
-                                Ls.Modificar(L, C, P,True)
+                                Ls.Modificar(L, C, P,True,T)
                         else:
                             self.rep=True
                             Estado.Modificar(L,"No hacer nada")
@@ -488,19 +509,19 @@ class app():
                 else:
                     if str(P).isdigit():
                         if int(C)<int(P):
-                            Ls.Modificar(L, C, P-1,es)
+                            Ls.Modificar(L, C, P-1,es,T)
                             Estado.Modificar(L,"Mover brazo - componente "+str(P-1))
                             if int(C) == int(P-1) and str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
-                                Ls.Modificar(L, C, P-1,True) 
+                                Ls.Modificar(L, C, P-1,True,T) 
                         else:
-                            Ls.Modificar(L, C, P+1,es)
+                            Ls.Modificar(L, C, P+1,es,T)
                             Estado.Modificar(L,"Mover brazo - componente "+str(P+1))
                             if int(C) == int(P+1) and str(colaE.retornar_seleccionado(1).getLinea())==str(L) and str(colaE.retornar_seleccionado(1).getComponente())==str(C):
-                                Ls.Modificar(L, C, P+1,True)
+                                Ls.Modificar(L, C, P+1,True,T)
             
                 if cambio==True:
                     cambio=False
-                    Ls.Modificar(L, C, P,self.rep)
+                    Ls.Modificar(L, C, P,es,TT)
                     self.rep=False 
            
             
@@ -533,6 +554,7 @@ class app():
         self.listEnsam.insert(END, "")
         ET.SubElement(self.ProductoXML, "TiempoTotal").text=str(tiempo)
         xmlstr = minidom.parseString(ET.tostring(self.SalidaXML)).toprettyxml(indent="   ")
+        #self.
         with open(str(self.NombreSimulacion)+".xml", "w") as f:
             f.write(xmlstr)
         prog.join()
